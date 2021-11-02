@@ -17,10 +17,12 @@ import br.com.gama.cashmachine.exceptions.ExceptionHandler;
 import br.com.gama.cashmachine.exceptions.NotAcceptableException;
 import br.com.gama.cashmachine.exceptions.NotFoundException;
 import br.com.gama.cashmachine.factories.CurrentAccountWithdrawFactory;
+import br.com.gama.cashmachine.factories.WithdrawFactory;
 import br.com.gama.cashmachine.forms.CurrentAccountWithdrawForm;
 import br.com.gama.cashmachine.repositories.MachineMoneyBillsRepository;
 import br.com.gama.cashmachine.repositories.MachineRepository;
 import br.com.gama.cashmachine.repositories.MoneyBillsRepository;
+import br.com.gama.cashmachine.repositories.WithdrawRepository;
 
 @Service
 public class CurrentAccountService {
@@ -34,6 +36,9 @@ public class CurrentAccountService {
 	@Autowired
 	private MachineMoneyBillsRepository machineMoneyRepository;
 
+	@Autowired
+	private WithdrawRepository withdrawRepository;
+
 	public List<CurrentAccountWithdrawDto> withdraw(UUID machineId, CurrentAccountWithdrawForm form)
 			throws ExceptionHandler {
 		boolean valueIsInvalid = form.value <= 0 || form.value != (int) form.value || (form.value % 5) != 0;
@@ -42,12 +47,9 @@ public class CurrentAccountService {
 			throw new BadRequestException("Valor de saque inválido");
 		}
 
-		var result = machineRepository.findById(machineId);
-		if (!result.isPresent()) {
-			throw new NotFoundException("Máquina não encontrado");
-		}
+		Machine machine = machineRepository.findById(machineId)
+				.orElseThrow(() -> new NotFoundException("Máquina não encontrado"));
 
-		Machine machine = result.get();
 		if (machine.getBalance() < form.value) {
 			throw new NotAcceptableException("Caixa temporariamente indisponível");
 		}
@@ -56,7 +58,7 @@ public class CurrentAccountService {
 		List<MoneyBills> moneyBills = moneyBillsRepository.findByActiveTrueOrderByValueDesc();
 		List<CurrentAccountWithdrawDto> withdrawList = new ArrayList<CurrentAccountWithdrawDto>();
 		Set<MachineMoneyBills> machineMoney = machine.getMoneyBills();
-		List<MachineMoneyBills> listToSave = new ArrayList<MachineMoneyBills>();
+		List<MachineMoneyBills> machineMoneyToSave = new ArrayList<MachineMoneyBills>();
 
 		for (int i = 0; i < moneyBills.size(); i++) {
 			MoneyBills money = moneyBills.get(i);
@@ -77,7 +79,7 @@ public class CurrentAccountService {
 					}
 
 					machineMoneyFind.setQuantity(machineMoneyFind.getQuantity() - quantity);
-					listToSave.add(machineMoneyFind);
+					machineMoneyToSave.add(machineMoneyFind);
 				} else {
 					quantity = 0;
 				}
@@ -96,9 +98,11 @@ public class CurrentAccountService {
 			throw new NotAcceptableException("Caixa temporariamente indisponível");
 		}
 
-		machineMoneyRepository.saveAll(listToSave);
 		machine.setBalance(machine.getBalance() - form.value);
 		machineRepository.save(machine);
+
+		machineMoneyRepository.saveAll(machineMoneyToSave);
+		withdrawRepository.save(WithdrawFactory.Create(machine, form.value));
 
 		return withdrawList;
 	}
