@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,15 @@ public class CurrentAccountService {
 
 	@Autowired
 	private WithdrawRepository withdrawRepository;
+
+	public List<CurrentAccountWithdrawDto> balance(UUID machineId) throws ExceptionHandler {
+		Machine machine = machineRepository.findById(machineId)
+				.orElseThrow(() -> new NotFoundException("Máquina não encontrado"));
+
+		return machine.getMoneyBills().stream()
+				.map((mm) -> CurrentAccountWithdrawFactory.Create(mm.getMoneyBills().getLabel(), mm.getQuantity()))
+				.collect(Collectors.toList());
+	}
 
 	public List<CurrentAccountWithdrawDto> withdraw(UUID machineId, CurrentAccountWithdrawForm form)
 			throws ExceptionHandler {

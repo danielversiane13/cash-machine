@@ -7,6 +7,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +25,13 @@ public class CurrentAccountController {
 
 	@Autowired
 	private CurrentAccountService service;
+
+	@GetMapping(value = "/{machineId}")
+	public ResponseEntity<List<CurrentAccountWithdrawDto>> balance(@PathVariable UUID machineId)
+			throws ExceptionHandler {
+		var dto = service.balance(machineId);
+		return ResponseEntity.ok(dto);
+	}
 
 	@PostMapping(value = "/{machineId}/withdraw")
 	public ResponseEntity<List<CurrentAccountWithdrawDto>> create(@PathVariable UUID machineId,
