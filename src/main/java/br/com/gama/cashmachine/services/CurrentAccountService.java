@@ -7,6 +7,8 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.gama.cashmachine.config.ExceptionHandler;
+import br.com.gama.cashmachine.config.NotFoundException;
 import br.com.gama.cashmachine.dto.CurrentAccountWithdrawDto;
 import br.com.gama.cashmachine.entities.Machine;
 import br.com.gama.cashmachine.factories.CurrentAccountWithdrawFactory;
@@ -19,11 +21,12 @@ public class CurrentAccountService {
 	@Autowired
 	private MachineRepository machineRepository;
 
-	public List<CurrentAccountWithdrawDto> withdraw(UUID machineId, CurrentAccountWithdrawForm form) {
+	public List<CurrentAccountWithdrawDto> withdraw(UUID machineId, CurrentAccountWithdrawForm form)
+			throws ExceptionHandler {
 		var result = machineRepository.findById(machineId);
 
 		if (!result.isPresent()) {
-			return null;
+			throw new NotFoundException("Máquina não encontrado");
 		}
 
 		Machine machine = result.get();

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.gama.cashmachine.config.ExceptionHandler;
 import br.com.gama.cashmachine.dto.CurrentAccountWithdrawDto;
 import br.com.gama.cashmachine.forms.CurrentAccountWithdrawForm;
 import br.com.gama.cashmachine.services.CurrentAccountService;
@@ -26,7 +27,8 @@ public class CurrentAccountController {
 
 	@PostMapping(value = "/{machineId}/withdraw")
 	public ResponseEntity<List<CurrentAccountWithdrawDto>> create(@PathVariable UUID machineId,
-			@RequestBody @Valid CurrentAccountWithdrawForm form) {
+			@RequestBody @Valid CurrentAccountWithdrawForm form) throws ExceptionHandler {
+
 		var dto = service.withdraw(machineId, form);
 		return ResponseEntity.ok(dto);
 	}
