@@ -9,17 +9,24 @@ import org.springframework.stereotype.Service;
 
 import br.com.gama.cashmachine.dto.CurrentAccountWithdrawDto;
 import br.com.gama.cashmachine.entities.Machine;
+import br.com.gama.cashmachine.entities.MoneyBills;
+import br.com.gama.cashmachine.exceptions.BadRequestException;
 import br.com.gama.cashmachine.exceptions.ExceptionHandler;
+import br.com.gama.cashmachine.exceptions.NotAcceptableException;
 import br.com.gama.cashmachine.exceptions.NotFoundException;
 import br.com.gama.cashmachine.factories.CurrentAccountWithdrawFactory;
 import br.com.gama.cashmachine.forms.CurrentAccountWithdrawForm;
 import br.com.gama.cashmachine.repositories.MachineRepository;
+import br.com.gama.cashmachine.repositories.MoneyBillsRepository;
 
 @Service
 public class CurrentAccountService {
 
 	@Autowired
 	private MachineRepository machineRepository;
+
+	@Autowired
+	private MoneyBillsRepository moneyBillsRepository;
 
 	public List<CurrentAccountWithdrawDto> withdraw(UUID machineId, CurrentAccountWithdrawForm form)
 			throws ExceptionHandler {
@@ -35,18 +42,40 @@ public class CurrentAccountService {
 		}
 
 		Machine machine = result.get();
+		if (machine.getBalance() < form.value) {
+			throw new NotAcceptableException("Caixa temporariamente indisponível");
+		}
 
-		// TODO: Add withdraw logic
+		int _value = form.value;
+		List<MoneyBills> moneyBills = moneyBillsRepository.findByActiveTrueOrderByValueDesc();
+		List<CurrentAccountWithdrawDto> withdrawList = new ArrayList<CurrentAccountWithdrawDto>();
 
-		List<CurrentAccountWithdrawDto> arr = new ArrayList<CurrentAccountWithdrawDto>();
+		for (int i = 0; i < moneyBills.size(); i++) {
+			MoneyBills money = moneyBills.get(i);
+			int quantity = _value / money.getValue();
+			_value = _value - (money.getValue() * quantity);
 
-		arr.add(CurrentAccountWithdrawFactory.Create("5", 1));
-		arr.add(CurrentAccountWithdrawFactory.Create("10", 2));
-		arr.add(CurrentAccountWithdrawFactory.Create("20", 3));
-		arr.add(CurrentAccountWithdrawFactory.Create("50", 4));
-		arr.add(CurrentAccountWithdrawFactory.Create("100", 0));
+			// TODO: Add validation quantity of money bills
 
-		return arr;
+			// Case needs values only > 0
+//			if (quantity == 0) {
+//				continue;
+//			}
+
+			withdrawList.add(CurrentAccountWithdrawFactory.Create(money.getLabel(), quantity));
+
+			// Case needs values only > 0
+//			if (_value == 0) {
+//				break;
+//			}
+		}
+
+		// TODO: Add validation if _value > 0, throw error 406
+
+		machine.setBalance(machine.getBalance() - form.value);
+		machineRepository.save(machine);
+
+		return withdrawList;
 	}
 
 }
