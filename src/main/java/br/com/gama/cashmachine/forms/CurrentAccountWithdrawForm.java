@@ -1,12 +1,10 @@
 package br.com.gama.cashmachine.forms;
 
-import javax.persistence.Column;
-import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.Range;
 
 public class CurrentAccountWithdrawForm {
 
-	@Column(name = "value", nullable = false)
-	@NotNull
-	public Integer value;
+	@Range(min = 1)
+	public int value;
 
 }
