@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.gama.cashmachine.dto.MachineDto;
+import br.com.gama.cashmachine.exceptions.ExceptionHandler;
 import br.com.gama.cashmachine.forms.MachineForm;
 import br.com.gama.cashmachine.services.MachineService;
 
@@ -43,21 +44,22 @@ public class MachineController {
 	}
 
 	@GetMapping(value = "/{machineId}")
-	public ResponseEntity<MachineDto> findById(@PathVariable UUID machineId) {
-		var result = service.findById(machineId);
-		return result != null ? ResponseEntity.ok(result) : ResponseEntity.notFound().build();
+	public ResponseEntity<MachineDto> findById(@PathVariable UUID machineId) throws ExceptionHandler {
+		var dto = service.findById(machineId);
+		return ResponseEntity.ok(dto);
 	}
 
 	@PutMapping(value = "/{machineId}")
-	public ResponseEntity<MachineDto> update(@PathVariable UUID machineId, @RequestBody @Valid MachineForm form) {
+	public ResponseEntity<MachineDto> update(@PathVariable UUID machineId, @RequestBody @Valid MachineForm form)
+			throws ExceptionHandler {
 		var dto = service.update(form, machineId);
 		return dto != null ? ResponseEntity.ok(dto) : ResponseEntity.notFound().build();
 	}
 
-	@DeleteMapping(value = "/{machineId}")
-	public ResponseEntity<Void> destroy(@PathVariable UUID machineId) {
-		service.deleteById(machineId);
-		return ResponseEntity.noContent().build();
-	}
+//	@DeleteMapping(value = "/{machineId}")
+//	public ResponseEntity<Void> destroy(@PathVariable UUID machineId) throws ExceptionHandler {
+//		service.deleteById(machineId);
+//		return ResponseEntity.noContent().build();
+//	}
 
 }

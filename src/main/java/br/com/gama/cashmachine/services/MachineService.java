@@ -13,6 +13,8 @@ import br.com.gama.cashmachine.dto.MachineDto;
 import br.com.gama.cashmachine.entities.Machine;
 import br.com.gama.cashmachine.entities.MachineMoneyBills;
 import br.com.gama.cashmachine.entities.MoneyBills;
+import br.com.gama.cashmachine.exceptions.ExceptionHandler;
+import br.com.gama.cashmachine.exceptions.NotFoundException;
 import br.com.gama.cashmachine.factories.MachineFactory;
 import br.com.gama.cashmachine.forms.MachineForm;
 import br.com.gama.cashmachine.repositories.MachineMoneyBillsRepository;
@@ -35,10 +37,10 @@ public class MachineService {
 		return repository.findAll(pageable).map(MachineFactory::Create);
 	}
 
-	public MachineDto findById(UUID id) {
-		var result = repository.findById(id);
+	public MachineDto findById(UUID id) throws ExceptionHandler {
+		Machine machine = repository.findById(id).orElseThrow(() -> new NotFoundException("Máquina não encontrado"));
 
-		return result.isPresent() ? MachineFactory.Create(result.get()) : null;
+		return MachineFactory.Create(machine);
 	}
 
 	public MachineDto create(MachineForm form) {
@@ -54,25 +56,19 @@ public class MachineService {
 		return MachineFactory.Create(machine);
 	}
 
-	public MachineDto update(MachineForm form, UUID id) {
-		var result = repository.findById(id);
+	public MachineDto update(MachineForm form, UUID id) throws ExceptionHandler {
+		Machine machine = repository.findById(id).orElseThrow(() -> new NotFoundException("Máquina não encontrado"));
 
-		if (!result.isPresent()) {
-			return null;
-		}
+		machine.setName(form.name);
+		machine.setUpdatedAt(LocalDateTime.now());
+		repository.save(machine);
 
-		var customer = result.get();
-
-		customer.setName(form.name);
-		customer.setUpdatedAt(LocalDateTime.now());
-
-		repository.save(customer);
-
-		return MachineFactory.Create(customer);
+		return MachineFactory.Create(machine);
 	}
 
-	public void deleteById(UUID id) {
-		repository.deleteById(id);
+	public void deleteById(UUID id) throws ExceptionHandler {
+		Machine machine = repository.findById(id).orElseThrow(() -> new NotFoundException("Máquina não encontrado"));
+		repository.delete(machine);
 	}
 
 }

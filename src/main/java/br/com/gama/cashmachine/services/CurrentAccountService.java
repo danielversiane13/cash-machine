@@ -1,5 +1,6 @@
 package br.com.gama.cashmachine.services;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -92,6 +93,7 @@ public class CurrentAccountService {
 					}
 
 					machineMoneyFind.setQuantity(machineMoneyFind.getQuantity() - quantity);
+					machineMoneyFind.setUpdatedAt(LocalDateTime.now());
 					machineMoneyToSave.add(machineMoneyFind);
 				} else {
 					quantity = 0;
@@ -112,6 +114,7 @@ public class CurrentAccountService {
 		}
 
 		machine.setBalance(machine.getBalance() - form.value);
+		machine.setUpdatedAt(LocalDateTime.now());
 		machineRepository.save(machine);
 
 		machineMoneyRepository.saveAll(machineMoneyToSave);
@@ -130,12 +133,14 @@ public class CurrentAccountService {
 
 		int newMachineBalance = (form.quantity * moneyBills.getValue()) + machine.getBalance();
 		machine.setBalance(newMachineBalance);
+		machine.setUpdatedAt(LocalDateTime.now());
 
 		MachineMoneyBills machineMoneyFind = machine.getMoneyBills().stream()
 				.filter(mm -> mm.getMoneyBills().getId() == moneyBills.getId()).findFirst().get();
 
 		int newMachineQuantity = machineMoneyFind.getQuantity() + form.quantity;
 		machineMoneyFind.setQuantity(newMachineQuantity);
+		machineMoneyFind.setUpdatedAt(LocalDateTime.now());
 
 		machineRepository.save(machine);
 		machineMoneyRepository.save(machineMoneyFind);
