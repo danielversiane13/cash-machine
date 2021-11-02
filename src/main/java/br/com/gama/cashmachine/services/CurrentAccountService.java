@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.gama.cashmachine.dto.CurrentAccountWithdrawDto;
+import br.com.gama.cashmachine.dto.MachineDto;
 import br.com.gama.cashmachine.entities.Machine;
 import br.com.gama.cashmachine.entities.MachineMoneyBills;
 import br.com.gama.cashmachine.entities.MoneyBills;
@@ -18,7 +19,9 @@ import br.com.gama.cashmachine.exceptions.ExceptionHandler;
 import br.com.gama.cashmachine.exceptions.NotAcceptableException;
 import br.com.gama.cashmachine.exceptions.NotFoundException;
 import br.com.gama.cashmachine.factories.CurrentAccountWithdrawFactory;
+import br.com.gama.cashmachine.factories.MachineFactory;
 import br.com.gama.cashmachine.factories.WithdrawFactory;
+import br.com.gama.cashmachine.forms.CurrentAccountDepositForm;
 import br.com.gama.cashmachine.forms.CurrentAccountWithdrawForm;
 import br.com.gama.cashmachine.repositories.MachineMoneyBillsRepository;
 import br.com.gama.cashmachine.repositories.MachineRepository;
@@ -115,6 +118,29 @@ public class CurrentAccountService {
 		withdrawRepository.save(WithdrawFactory.Create(machine, form.value));
 
 		return withdrawList;
+	}
+
+	public MachineDto deposit(UUID machineId, UUID moneyBillsId, CurrentAccountDepositForm form)
+			throws ExceptionHandler {
+		Machine machine = machineRepository.findById(machineId)
+				.orElseThrow(() -> new NotFoundException("Máquina não encontrado"));
+
+		MoneyBills moneyBills = moneyBillsRepository.findById(moneyBillsId)
+				.orElseThrow(() -> new NotFoundException("Nota não encontrado"));
+
+		int newMachineBalance = (form.quantity * moneyBills.getValue()) + machine.getBalance();
+		machine.setBalance(newMachineBalance);
+
+		MachineMoneyBills machineMoneyFind = machine.getMoneyBills().stream()
+				.filter(mm -> mm.getMoneyBills().getId() == moneyBills.getId()).findFirst().get();
+
+		int newMachineQuantity = machineMoneyFind.getQuantity() + form.quantity;
+		machineMoneyFind.setQuantity(newMachineQuantity);
+
+		machineRepository.save(machine);
+		machineMoneyRepository.save(machineMoneyFind);
+
+		return MachineFactory.Create(machine);
 	}
 
 }

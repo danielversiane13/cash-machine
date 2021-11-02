@@ -7,7 +7,7 @@ import br.com.gama.cashmachine.forms.MachineForm;
 public class MachineFactory {
 
 	public static Machine Create(MachineForm form) {
-		return new Machine(form.name, form.balance);
+		return new Machine(form.name);
 	}
 
 	public static MachineDto Create(Machine machine) {

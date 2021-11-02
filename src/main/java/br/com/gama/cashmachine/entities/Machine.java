@@ -18,10 +18,9 @@ public class Machine extends SuperEntity {
 		super();
 	}
 
-	public Machine(String name, int balance) {
+	public Machine(String name) {
 		super();
 		this.name = name;
-		this.balance = balance;
 	}
 
 	public String getName() {

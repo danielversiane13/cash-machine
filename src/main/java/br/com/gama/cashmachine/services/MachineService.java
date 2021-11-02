@@ -1,6 +1,7 @@
 package br.com.gama.cashmachine.services;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,15 +11,25 @@ import org.springframework.stereotype.Service;
 
 import br.com.gama.cashmachine.dto.MachineDto;
 import br.com.gama.cashmachine.entities.Machine;
+import br.com.gama.cashmachine.entities.MachineMoneyBills;
+import br.com.gama.cashmachine.entities.MoneyBills;
 import br.com.gama.cashmachine.factories.MachineFactory;
 import br.com.gama.cashmachine.forms.MachineForm;
+import br.com.gama.cashmachine.repositories.MachineMoneyBillsRepository;
 import br.com.gama.cashmachine.repositories.MachineRepository;
+import br.com.gama.cashmachine.repositories.MoneyBillsRepository;
 
 @Service
 public class MachineService {
 
 	@Autowired
 	private MachineRepository repository;
+
+	@Autowired
+	private MoneyBillsRepository moneyBillsRepository;
+
+	@Autowired
+	private MachineMoneyBillsRepository machineMoneyBillsRepository;
 
 	public Page<MachineDto> findAll(Pageable pageable) {
 		return repository.findAll(pageable).map(MachineFactory::Create);
@@ -34,6 +45,12 @@ public class MachineService {
 		Machine machine = MachineFactory.Create(form);
 		repository.save(machine);
 
+		List<MoneyBills> moneyBills = moneyBillsRepository.findAll();
+
+		for (int i = 0; i < moneyBills.size(); i++) {
+			machineMoneyBillsRepository.save(new MachineMoneyBills(machine, moneyBills.get(i), 0));
+		}
+
 		return MachineFactory.Create(machine);
 	}
 
@@ -47,7 +64,6 @@ public class MachineService {
 		var customer = result.get();
 
 		customer.setName(form.name);
-		customer.setBalance(form.balance);
 		customer.setUpdatedAt(LocalDateTime.now());
 
 		repository.save(customer);
