@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.gama.cashmachine.dto.MoneyBillsDto;
 import br.com.gama.cashmachine.services.MoneyBillsService;
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping("/money-bills")
@@ -19,6 +20,7 @@ public class MoneyBillsController {
 	private MoneyBillsService service;
 
 	@GetMapping
+	@ApiOperation(value = "List money bills")
 	public ResponseEntity<List<MoneyBillsDto>> findAll() {
 		return ResponseEntity.ok(service.findAll());
 	}

@@ -20,6 +20,7 @@ import br.com.gama.cashmachine.exceptions.ExceptionHandler;
 import br.com.gama.cashmachine.forms.CurrentAccountDepositForm;
 import br.com.gama.cashmachine.forms.CurrentAccountWithdrawForm;
 import br.com.gama.cashmachine.services.CurrentAccountService;
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping("/current-account")
@@ -29,6 +30,7 @@ public class CurrentAccountController {
 	private CurrentAccountService service;
 
 	@GetMapping(value = "/{machineId}")
+	@ApiOperation(value = "Get quantity of each money bills")
 	public ResponseEntity<List<CurrentAccountWithdrawDto>> balance(@PathVariable UUID machineId)
 			throws ExceptionHandler {
 		var dto = service.balance(machineId);
@@ -36,7 +38,8 @@ public class CurrentAccountController {
 	}
 
 	@PostMapping(value = "/{machineId}/withdraw")
-	public ResponseEntity<List<CurrentAccountWithdrawDto>> create(@PathVariable UUID machineId,
+	@ApiOperation(value = "Withdraw balance")
+	public ResponseEntity<List<CurrentAccountWithdrawDto>> withdraw(@PathVariable UUID machineId,
 			@RequestBody @Valid CurrentAccountWithdrawForm form) throws ExceptionHandler {
 
 		var dto = service.withdraw(machineId, form);
@@ -44,7 +47,8 @@ public class CurrentAccountController {
 	}
 
 	@PostMapping(value = "/{machineId}/money-bills/{moneyBillsId}")
-	public ResponseEntity<MachineDto> create(@RequestBody @Valid CurrentAccountDepositForm form,
+	@ApiOperation(value = "Add quantity for one money bills")
+	public ResponseEntity<MachineDto> deposit(@RequestBody @Valid CurrentAccountDepositForm form,
 			@PathVariable UUID machineId, @PathVariable UUID moneyBillsId) throws ExceptionHandler {
 
 		var dto = service.deposit(machineId, moneyBillsId, form);

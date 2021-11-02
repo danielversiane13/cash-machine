@@ -23,6 +23,7 @@ import br.com.gama.cashmachine.dto.MachineDto;
 import br.com.gama.cashmachine.exceptions.ExceptionHandler;
 import br.com.gama.cashmachine.forms.MachineForm;
 import br.com.gama.cashmachine.services.MachineService;
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping("/machines")
@@ -32,11 +33,13 @@ public class MachineController {
 	private MachineService service;
 
 	@GetMapping
+	@ApiOperation(value = "Find all machines with paging")
 	public ResponseEntity<Page<MachineDto>> findAll(Pageable pageable) {
 		return ResponseEntity.ok(service.findAll(pageable));
 	}
 
 	@PostMapping
+	@ApiOperation(value = "Create a machine")
 	public ResponseEntity<MachineDto> create(@RequestBody @Valid MachineForm form, UriComponentsBuilder uriBuilder) {
 		var dto = service.create(form);
 		URI uri = uriBuilder.path("/machines/{machineId}").buildAndExpand(dto.id).toUri();
@@ -44,12 +47,14 @@ public class MachineController {
 	}
 
 	@GetMapping(value = "/{machineId}")
+	@ApiOperation(value = "Find a machine by id")
 	public ResponseEntity<MachineDto> findById(@PathVariable UUID machineId) throws ExceptionHandler {
 		var dto = service.findById(machineId);
 		return ResponseEntity.ok(dto);
 	}
 
 	@PutMapping(value = "/{machineId}")
+	@ApiOperation(value = "Update a machine by id")
 	public ResponseEntity<MachineDto> update(@PathVariable UUID machineId, @RequestBody @Valid MachineForm form)
 			throws ExceptionHandler {
 		var dto = service.update(form, machineId);

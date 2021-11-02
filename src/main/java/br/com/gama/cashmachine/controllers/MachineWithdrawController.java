@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.gama.cashmachine.dto.WithdrawDto;
 import br.com.gama.cashmachine.services.WithdrawService;
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping("/machines")
@@ -22,6 +23,7 @@ public class MachineWithdrawController {
 	private WithdrawService service;
 
 	@GetMapping(value = "/{machineId}/withdraws")
+	@ApiOperation(value = "List withdrawals by machine")
 	public ResponseEntity<Page<WithdrawDto>> findAll(Pageable pageable, @PathVariable UUID machineId) {
 		return ResponseEntity.ok(service.findByMachine(pageable, machineId));
 	}
