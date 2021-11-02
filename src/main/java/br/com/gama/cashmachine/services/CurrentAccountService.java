@@ -23,8 +23,13 @@ public class CurrentAccountService {
 
 	public List<CurrentAccountWithdrawDto> withdraw(UUID machineId, CurrentAccountWithdrawForm form)
 			throws ExceptionHandler {
-		var result = machineRepository.findById(machineId);
+		boolean valueIsInvalid = form.value <= 0 || form.value != (int) form.value || (form.value % 5) != 0;
 
+		if (valueIsInvalid) {
+			throw new BadRequestException("Valor de saque inválido");
+		}
+
+		var result = machineRepository.findById(machineId);
 		if (!result.isPresent()) {
 			throw new NotFoundException("Máquina não encontrado");
 		}
