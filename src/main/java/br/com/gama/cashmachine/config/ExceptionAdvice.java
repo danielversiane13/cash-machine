@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import br.com.gama.cashmachine.dto.ExceptionHandlerDto;
+import br.com.gama.cashmachine.exceptions.BadRequestException;
+import br.com.gama.cashmachine.exceptions.NotAcceptableException;
+import br.com.gama.cashmachine.exceptions.NotFoundException;
 import br.com.gama.cashmachine.factories.ExceptionHandlerFactory;
 
 @RestControllerAdvice

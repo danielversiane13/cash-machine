@@ -1,4 +1,4 @@
-package br.com.gama.cashmachine.config;
+package br.com.gama.cashmachine.exceptions;
 
 import org.springframework.http.HttpStatus;
 

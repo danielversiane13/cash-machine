@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.gama.cashmachine.config.ExceptionHandler;
 import br.com.gama.cashmachine.dto.CurrentAccountWithdrawDto;
+import br.com.gama.cashmachine.exceptions.ExceptionHandler;
 import br.com.gama.cashmachine.forms.CurrentAccountWithdrawForm;
 import br.com.gama.cashmachine.services.CurrentAccountService;
 

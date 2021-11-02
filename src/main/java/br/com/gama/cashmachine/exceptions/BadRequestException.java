@@ -1,22 +1,22 @@
-package br.com.gama.cashmachine.config;
+package br.com.gama.cashmachine.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class NotFoundException extends ExceptionHandler {
+public class BadRequestException extends ExceptionHandler {
 
 	/**
 	 * Default serial version
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public NotFoundException() {
+	public BadRequestException() {
 		super();
 	}
 
-	public NotFoundException(String message) {
-		super(HttpStatus.NOT_FOUND, message);
+	public BadRequestException(String message) {
+		super(HttpStatus.BAD_REQUEST, message);
 	}
 
 }

@@ -7,10 +7,10 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import br.com.gama.cashmachine.config.ExceptionHandler;
-import br.com.gama.cashmachine.config.NotFoundException;
 import br.com.gama.cashmachine.dto.CurrentAccountWithdrawDto;
 import br.com.gama.cashmachine.entities.Machine;
+import br.com.gama.cashmachine.exceptions.ExceptionHandler;
+import br.com.gama.cashmachine.exceptions.NotFoundException;
 import br.com.gama.cashmachine.factories.CurrentAccountWithdrawFactory;
 import br.com.gama.cashmachine.forms.CurrentAccountWithdrawForm;
 import br.com.gama.cashmachine.repositories.MachineRepository;
