@@ -1,12 +1,18 @@
 package br.com.gama.cashmachine.entities;
 
+import java.util.Set;
+
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Machine extends SuperEntity {
 
 	private String name;
 	private int balance;
+
+	@OneToMany(mappedBy = "machine")
+	Set<MachineMoneyBills> machineMoney;
 
 	public Machine() {
 		super();
@@ -32,6 +38,10 @@ public class Machine extends SuperEntity {
 
 	public void setBalance(int balance) {
 		this.balance = balance;
+	}
+
+	public Set<MachineMoneyBills> getMoneyBills() {
+		return machineMoney;
 	}
 
 }
